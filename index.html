@@ -192,7 +192,9 @@ async function loadSkills() {
 
 skills.innerHTML += `
   <li>
-    ${s.name} (${s.type})
+
+ ${s.name} (${s.type}) - ${s.user?.name || "User"}
+   
     <button onclick="updateSkill('${s._id}')">Update</button>
     <button onclick="deleteSkill('${s._id}')">Delete</button>
   </li>
@@ -215,9 +217,17 @@ async function loadMessages() {
   const data = await res.json();
 
   chat.innerHTML = "";
-  data.forEach(m => {
-    chat.innerHTML += `<li>${m.text}</li>`;
-  });
+
+data.forEach(m => {
+  chat.innerHTML += `
+  <li>
+    <b>${m.username || "User"}</b> 
+    (${m.sender || "User"}) :
+    ${m.text}
+  </li>`;
+});
+
+  
 }
 
 loadSkills();
@@ -226,15 +236,36 @@ loadMessages();
 // SOCKET.IO
 const socket = io(API);
 
+
+
+
 function send() {
-  socket.emit("sendMessage", msg.value);
+
+  const message = {
+    text: msg.value,
+    username: name.value || "User",
+    sender: "User"
+  };
+
+  socket.emit("sendMessage", message);
   msg.value = "";
 }
+  
+
 
 socket.on("receiveMessage", (m) => {
-  chat.innerHTML += `<li>${m.text}</li>`;
+  chat.innerHTML += `
+  <li>
+    <b>${m.username || "User"}</b> 
+    (${m.sender || "User"}) :
+    ${m.text}
+  </li>`;
 });
+  
 
+
+
+  
 
 async function deleteSkill(id) {
   await fetch(API + "/skills/" + id, {
