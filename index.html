@@ -250,25 +250,32 @@ async function deleteSkill(id) {
 
 
 
-
-
-
-
-
 async function updateSkill(id) {
+  const newName = prompt("Enter new skill name");
+
+  if (!newName) {
+    alert("No input given!");
+    return;
+  }
+
   await fetch(API + "/skills/" + id, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
       "Authorization": token
     },
-    body: JSON.stringify({ name: "Updated Skill" })
+    body: JSON.stringify({ name: newName })
   });
 
+  alert("Updated successfully!");
   loadSkills();
 }
 
 
+
+
+
+  
 
   
 
