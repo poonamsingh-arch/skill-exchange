@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>Skill Exchange App</title>
+  <style>
+    body {
+      font-family: Arial;
+      background: #0f172a;
+      color: white;
+      margin: 0;
+    }
+
+```
+h2 {
+  color: #38bdf8;
+}
+
+.container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  padding: 20px;
+}
+
+.box {
+  background: #1e293b;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.5);
+}
+
+input, select, button {
+  margin: 5px 0;
+  padding: 8px;
+  width: 100%;
+  border-radius: 5px;
+  border: none;
+}
+
+button {
+  background: #38bdf8;
+  color: black;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+button:hover {
+  background: #0ea5e9;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+li {
+  background: #334155;
+  margin: 5px 0;
+  padding: 8px;
+  border-radius: 5px;
+}
+
+#chatBox {
+  height: 200px;
+  overflow-y: auto;
+}
+```
+
+  </style>
+</head>
+
+<body>
+
+<h1 style="text-align:center;">🚀 Skill Exchange Platform</h1>
+
+<div class="container">
+
+  <!-- AUTH -->
+
+  <div class="box">
+    <h2>Signup</h2>
+    <input id="name" placeholder="Name">
+    <input id="email" placeholder="Email">
+    <input id="password" placeholder="Password">
+    <button onclick="signup()">Signup</button>
+
+```
+<h2>Login</h2>
+<input id="loginEmail" placeholder="Email">
+<input id="loginPassword" placeholder="Password">
+<button onclick="login()">Login</button>
+```
+
+  </div>
+
+  <!-- SKILLS -->
+
+  <div class="box">
+    <h2>Add Skill</h2>
+    <input id="skill" placeholder="Skill name">
+    <select id="type">
+      <option value="teach">Teach</option>
+      <option value="learn">Learn</option>
+    </select>
+    <button onclick="addSkill()">Add Skill</button>
+
+```
+<h2>Skills</h2>
+<ul id="skills"></ul>
+```
+
+  </div>
+
+  <!-- CHAT -->
+
+  <div class="box" style="grid-column: span 2;">
+    <h2>Live Chat 💬</h2>
+    <div id="chatBox">
+      <ul id="chat"></ul>
+    </div>
+    <input id="msg" placeholder="Type message...">
+    <button onclick="send()">Send</button>
+  </div>
+
+</div>
+
+<script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+
+<script>
+const API = "https://skill-backend-ul3j.onrender.com";
+let token = "";
+
+// Signup
+async function signup() {
+  await fetch(API + "/auth/signup", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({
+      name: name.value,
+      email: email.value,
+      password: password.value
+    })
+  });
+  alert("Signup successful!");
+}
+
+// Login
+async function login() {
+  const res = await fetch(API + "/auth/login", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({
+      email: loginEmail.value,
+      password: loginPassword.value
+    })
+  });
+
+  const data = await res.json();
+  token = data.token;
+  alert("Login successful!");
+}
+
+// Add Skill
+async function addSkill() {
+  await fetch(API + "/skills", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": token
+    },
+    body: JSON.stringify({
+      name: skill.value,
+      type: type.value
+    })
+  });
+
+  loadSkills();
+}
+
+// Load Skills
+async function loadSkills() {
+  const res = await fetch(API + "/skills");
+  const data = await res.json();
+
+  skills.innerHTML = "";
+  data.forEach(s => {
+    skills.innerHTML += `<li>${s.name} (${s.type})</li>`;
+  });
+}
+
+// Load Messages
+async function loadMessages() {
+  const res = await fetch(API + "/messages");
+  const data = await res.json();
+
+  chat.innerHTML = "";
+  data.forEach(m => {
+    chat.innerHTML += `<li>${m.text}</li>`;
+  });
+}
+
+loadSkills();
+loadMessages();
+
+// SOCKET.IO
+const socket = io(API);
+
+function send() {
+  socket.emit("sendMessage", msg.value);
+  msg.value = "";
+}
+
+socket.on("receiveMessage", (m) => {
+  chat.innerHTML += `<li>${m.text}</li>`;
+});
+
+
+
+// UPDATE skill
+router.put("/:id", async (req, res) => {
+  try {
+    const updatedSkill = await Skill.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
+    res.json(updatedSkill);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// DELETE skill
+router.delete("/:id", async (req, res) => {
+  try {
+    await Skill.findByIdAndDelete(req.params.id);
+    res.json({ message: "Skill deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
+
+
+
+
+
+
+</script>
+
+</body>
+</html>
