@@ -146,7 +146,12 @@ async function signup() {
 }
 
 // Login
+
+
+
+// Login
 async function login() {
+
   const res = await fetch(API + "/auth/login", {
     method: "POST",
     headers: {"Content-Type": "application/json"},
@@ -157,9 +162,24 @@ async function login() {
   });
 
   const data = await res.json();
+
   token = data.token;
+
+  // ADD THIS LINE
+  localStorage.setItem("username", data.user.name);
+
   alert("Login successful!");
 }
+
+
+
+
+
+
+
+
+
+  
 
 // Add Skill
 async function addSkill() {
