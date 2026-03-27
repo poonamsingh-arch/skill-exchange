@@ -166,39 +166,40 @@ async function login() {
   const data = await res.json();
   token = data.token;
 
-  currentUser = name.value; // ✅ take name from input
+  // ✅ ask user name manually (simple fix)
+  currentUser = prompt("Enter your name:");
 
   alert("Login successful!");
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
   
+
+
+
+
+
+
+
 
 function send() {
 
   const message = {
     text: msg.value,
-    username: currentUser || "User",
-    sender: currentUser || "User"
+    username: currentUser,
+    sender: currentUser
   };
 
   socket.emit("sendMessage", message);
   msg.value = "";
 }
+
   
 
+
+
+
+
+  
 
 
 
@@ -268,12 +269,19 @@ async function loadMessages() {
   chat.innerHTML = "";
 
 data.forEach(m => {
-  chat.innerHTML += `
+
+chat.innerHTML += `
   <li>
-    <b>${m.username || "User"}</b> 
-    (${m.sender || "User"}) :
+    <b>${m.username}</b> 
+    (${m.sender}) :
     ${m.text}
   </li>`;
+
+
+
+
+
+  
 });
 
   
@@ -300,12 +308,22 @@ const socket = io(API);
 
 
 socket.on("receiveMessage", (m) => {
-  chat.innerHTML += `
+
+chat.innerHTML += `
   <li>
-    <b>${m.username || "User"}</b> 
-    (${m.sender || "User"}) :
+    <b>${m.username}</b> 
+    (${m.sender}) :
     ${m.text}
   </li>`;
+
+
+
+
+
+
+
+
+  
 });
   
 
