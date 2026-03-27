@@ -131,6 +131,11 @@ li {
 const API = "https://skill-backend-ul3j.onrender.com";
 let token = "";
 
+let currentUser = "";   // ✅ ADD THIS LINE
+
+
+  
+
 // Signup
 async function signup() {
   await fetch(API + "/auth/signup", {
@@ -160,12 +165,25 @@ async function login() {
 
   const data = await res.json();
   token = data.token;
+currentUser = data.user.name;
+
+
+  
   alert("Login successful!");
 }
 
 
+function send() {
 
+  const message = {
+    text: msg.value,
+    username: currentUser || "User",
+    sender: currentUser || "User"
+  };
 
+  socket.emit("sendMessage", message);
+  msg.value = "";
+}
   
 
 
@@ -208,8 +226,11 @@ async function loadSkills() {
 skills.innerHTML += `
   <li>
 
- ${s.name} (${s.type}) - ${s.user?.name || "User"}
-   
+skillname: ${s.name} (${s.type})
+
+
+
+
     <button onclick="updateSkill('${s._id}')">Update</button>
     <button onclick="deleteSkill('${s._id}')">Delete</button>
   </li>
@@ -254,17 +275,14 @@ const socket = io(API);
 
 
 
-function send() {
 
-  const message = {
-    text: msg.value,
-    username: name.value || "User",
-    sender: "User"
-  };
 
-  socket.emit("sendMessage", message);
-  msg.value = "";
-}
+
+
+
+
+
+  
   
 
 
