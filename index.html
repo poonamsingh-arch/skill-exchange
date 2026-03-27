@@ -152,7 +152,7 @@ async function signup() {
 
 // Login
 
-// Login
+
 async function login() {
   const res = await fetch(API + "/auth/login", {
     method: "POST",
@@ -165,13 +165,26 @@ async function login() {
 
   const data = await res.json();
   token = data.token;
-currentUser = data.user.name;
 
+  currentUser = name.value; // ✅ take name from input
 
-  
   alert("Login successful!");
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
 
 function send() {
 
